@@ -44,6 +44,9 @@ INSTALLED_APPS = [
     'travel',
 ]
 
+# Model user mặc định
+AUTH_USER_MODEL = 'travel.User'
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

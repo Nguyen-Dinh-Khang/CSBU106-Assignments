@@ -12,7 +12,7 @@ class User(AbstractUser):
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='USER')
 
     # Dùng username để đăng nhập chính
-    USERNAME_FIELD = 'username' 
+    USERNAME_FIELD = 'email' 
 
 
     def __str__(self):
