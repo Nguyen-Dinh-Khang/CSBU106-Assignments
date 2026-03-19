@@ -4,20 +4,20 @@ from django.conf import settings
 class TravelInput(models.Model):
     budget = models.DecimalField(max_digits=12, decimal_places=2)
     num_people = models.IntegerField(default=1)
-    city = models.IntegerField()
-    travel_style = models.IntegerField()
+    area = models.IntegerField()
 
     # Ngày đi và ngày về
     departure_date = models.DateField() 
     return_date = models.DateField()    
     
     # Các trường này cho phép để trống
-    location = models.IntegerField(null=True, blank=True)
+    location = models.CharField(max_length=24, null=True, blank=True)
+    travel_style = models.IntegerField(null=True, blank=True)
     food_type = models.IntegerField(null=True, blank=True)
     accommodation_type = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
-        return f"Trip to {self.city} for {self.num_people} people"
+        return f"Trip to {self.area} for {self.num_people} people"
 
 
 class TravelOutput(models.Model):
@@ -33,7 +33,7 @@ class TravelOutput(models.Model):
     # Dùng CharField để linh hoạt (có thể lưu ObjectId của MongoDB)
     input_id = models.CharField(max_length=100, verbose_name="ID Input gốc")
 
-    # Thông tin tổng kết (Tổng chi phí, lưu ý chung, tips...)
+    # Thông tin tổng kết (thông tin chung, hotel, ...)
     summary_info = models.JSONField(default=dict, verbose_name="Thông tin tổng kết")
 
     # Lịch trình chi tiết theo từng ngày

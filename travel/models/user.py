@@ -13,6 +13,7 @@ class User(AbstractUser):
 
     # Dùng username để đăng nhập chính
     USERNAME_FIELD = 'email' 
+    REQUIRED_FIELDS = ['username']
 
 
     def __str__(self):

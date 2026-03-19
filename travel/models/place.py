@@ -93,19 +93,19 @@ class CommonInfo(models.Model):
     active_hours = models.JSONField(default=list) # [1, 3] (0 cả ngày, 1 sáng, 2 trưa, 3 tối)
 
     # Giá cả
-    price_level = models.IntegerField(default=1) # [1] (1: dưới 100k)
+    price_level = models.IntegerField(default=1) # [1] (1: dưới 100k/đơn vị/người)  (đơn vị có thể là đêm hoặc bữa)
     min_price = models.FloatField(null=True, blank=True)
     max_price = models.FloatField(null=True, blank=True)
 
     # Giảm giá và sự ưu tiên
-    has_surge_price = models.BooleanField(default=False, help_text="Có tăng giá cuối tuần/lễ không")
+    has_surge_price = models.BooleanField(default=False, help_text="Có tăng giá cuối tuần/lễ không") # Có chương trình giảm giá hay không
     discounts = models.ArrayField(model_container=Discount, blank=True, default=list)
-    priority = models.IntegerField(default=0)
+    priority = models.IntegerField(default=0) # Điểm được tính dựa vào discounts
 
     # Đánh giá
-    review_count = models.IntegerField(default=0)
+    review_count = models.IntegerField(default=0) # Số lượng đánh giá
     rating = models.FloatField(default=0.0, help_text="Điểm đánh giá trung bình từ 0 đến 5")
-    rating_bucket = models.IntegerField(default=0)
+    rating_bucket = models.IntegerField(default=0) # Là rating nhưng làm tròn xuống
 
     # Comment
     comments = models.ArrayField(model_container=Comment, blank=True, default=list)
