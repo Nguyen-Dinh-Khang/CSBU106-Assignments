@@ -136,6 +136,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+# 1. URL dùng để truy cập ảnh từ trình duyệt/React (vd: http://localhost:8000/media/...)
+MEDIA_URL = '/media/'
+# 2. Đường dẫn vật lý đến thư mục media trên máy bạn
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 REST_FRAMEWORK = {

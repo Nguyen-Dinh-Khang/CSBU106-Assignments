@@ -68,12 +68,13 @@ class TravelOutput(models.Model):
 class Location(models.Model):
     name = models.CharField(max_length=255, help_text="Tên hiển thị (vd: Vinpearl Land)")
     # search_name dùng để tìm kiếm không dấu, viết thường giúp query cực nhanh
-    search_name = models.CharField(max_length=255, db_index=True, help_text="vd: vinpearl land")
+    search_name = models.CharField(max_length=255, help_text="vd: vinpearl land")
 
     # Tọa độ chuẩn GeoJSON để dùng 2dsphere
     coordinate = models.JSONField(default=dict) 
     # Cấu trúc lưu: {"type": "Point", "coordinates": [long, lat]}
 
+    is_city = models.BooleanField(default=True)
     # Bán kính gợi ý khi tìm kiếm quanh điểm này (đơn vị: mét)
     # Thành phố có thể để 20000 (20km), điểm cụ thể để 2000 (2km)
     suggested_radius = models.IntegerField(default=5000)
@@ -82,7 +83,8 @@ class Location(models.Model):
         verbose_name = "Địa điểm hệ thống"
         # Đánh index cho search_name để tìm kiếm tên địa danh tức thì
         indexes = [
-            models.Index(fields=['search_name']),
+            # Đặt tên index cụ thể để tránh Django tự sinh tên loằng ngoằng
+            models.Index(fields=['search_name'], name='idx_location_search_name'),
         ]
 
     def __str__(self):

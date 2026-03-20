@@ -1,45 +1,33 @@
 from djongo import models
 from django.conf import settings
+from django.utils import timezone
 import uuid
 
 # --- Cấu trúc Nhúng (Embedded Models) ---
 
 # --- Menu quán ăn ----------------------------------------------------------------------------------------------------------------
 class Dish(models.Model):
-    dish_id = models.CharField(max_length=100, default=uuid.uuid4, editable=False)
+    dish_id = models.UUIDField(default=uuid.uuid4, editable=False)
     dish_name = models.CharField(max_length=100)
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    price = models.IntegerField()
     description = models.TextField(blank=True, help_text="Thông tin chi tiết")
 
     class Meta:
         abstract = True # Dùng để nhúng, không tạo bảng riêng
 
-class Menu(models.Model):
-    menu_name = models.CharField(max_length=100)
-    dishes = models.ArrayField(model_container=Dish, blank=True, null=True) # Danh sách món ăn nằm trong Menu
-
-    class Meta:
-        abstract = True
-
 # --- Giá phòng khác sạn ----------------------------------------------------------------------------------------------------------
 class RoomTypePrice(models.Model):
-    room_type_id = models.CharField(max_length=100, default=uuid.uuid4, editable=False)
+    room_type_id = models.UUIDField(default=uuid.uuid4, editable=False)
     type_name = models.CharField(max_length=100) # VD: Deluxe, Standard
-    price = models.DecimalField(max_digits=12, decimal_places=2)
+    price = models.IntegerField()
     description = models.TextField(blank=True, help_text="Thông tin chi tiết")
-
-    class Meta:
-        abstract = True
-
-class RoomPrice(models.Model):
-    room_types = models.ArrayField(model_container=RoomTypePrice, blank=True, null=True)
 
     class Meta:
         abstract = True
 
 # --- Giảm giá --------------------------------------------------------------------------------------------------------------------
 class Discount(models.Model):
-    discount_id = models.CharField(max_length=100, default=uuid.uuid4, editable=False)
+    discount_id = models.UUIDField(default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=200) # Tên chương trình
     percent = models.IntegerField()          # Con số % giảm giá (VD: 10, 20, 50)
     description = models.TextField(blank=True, help_text="Thông tin chi tiết")
@@ -53,6 +41,7 @@ class Discount(models.Model):
 
 # --- Comment ---------------------------------------------------------------------------------------------------------------------
 class Comment(models.Model):
+    comment_id = models.UUIDField(default=uuid.uuid4, editable=False)
     user_id = models.CharField(max_length=50)
     commenter = models.CharField(max_length=100)
     content = models.TextField()
@@ -117,25 +106,58 @@ class CommonInfo(models.Model):
         ]
     
 
-    # Tự động lưu rating_bucket
-    def save(self, *args, **kwargs):
-        # Tự động đồng bộ latitude/longitude vào field location trước khi lưu
-        # Lưu ý: Longitude (Kinh độ) phải đứng trước Latitude (Vĩ độ)
-        if hasattr(self, 'longitude') and hasattr(self, 'latitude'):
-            self.location = {
-                "type": "Point",
-                "coordinates": [float(self.longitude), float(self.latitude)]
-            }
+    def update_priority(self):
+        """
+        Logic: Tự động lọc bỏ các discount hết hạn và tính toán lại điểm priority.
+        Hàm này thay đổi trực tiếp dữ liệu trên instance (gán luôn).
+        """
+        today = timezone.now().date()
         
-        # Logic tự động lưu rating_bucket
-        self.rating_bucket = int(self.rating)
-        super().save(*args, **kwargs)
+        # 1. Kiểm tra nếu không có discount nào thì reset và thoát sớm
+        if not self.discounts:
+            self.priority = 0
+            return
 
+        # 2. LỌC: Gán lại danh sách discounts (Chỉ giữ cái còn hạn hoặc vô thời hạn)
+        self.discounts = [
+            d for d in self.discounts 
+            if getattr(d, 'end_date', None) is None or d.end_date >= today
+        ]
+
+        # 3. TÍNH TOÁN: Dựa trên danh sách đã lọc ở bước 2
+        if self.discounts:
+            total_percent = sum(getattr(d, 'percent', 0) for d in self.discounts)
+            self.priority = int(total_percent / len(self.discounts))
+        else:
+            self.priority = 0
+
+    # --- HÀM SAVE CHÍNH ---
+    def save(self, *args, **kwargs):
+        # 1. Tự động xử lý Discount và Priority (Gán luôn giá trị mới)
+        self.update_priority()
+
+        # 2. Tự động đồng bộ latitude/longitude vào field location
+        if hasattr(self, 'longitude') and hasattr(self, 'latitude'):
+            # Đảm bảo longitude/latitude không bị None trước khi ép kiểu float
+            if self.longitude is not None and self.latitude is not None:
+                self.location = {
+                    "type": "Point",
+                    "coordinates": [float(self.longitude), float(self.latitude)]
+                }
+        
+        # 3. Tự động cập nhật rating_bucket (làm tròn xuống từ rating)
+        # Sử dụng getattr để an toàn nếu rating chưa được khởi tạo
+        current_rating = getattr(self, 'rating', 0)
+        self.rating_bucket = int(current_rating)
+
+        # 4. Gọi hàm save của cha để ghi dữ liệu xuống Database
+        super().save(*args, **kwargs)
 
 # --- 3 Bảng riêng biệt (3 Collection trong MongoDB) ---
 class Restaurant(CommonInfo):
     cuisine_types = models.JSONField(default=list, blank=True)
-    menus = models.ArrayField(model_container=Menu)
+    dishes = models.ArrayField(model_container=Dish, blank=True, default=list)
+    image = models.ImageField(upload_to='restaurant/', null=True, blank=True)
 
     class Meta(CommonInfo.Meta):
         abstract = False
@@ -143,7 +165,9 @@ class Restaurant(CommonInfo):
 
 class Hotel(CommonInfo):
     hotel_type = models.IntegerField()
-    room_list = models.ArrayField(model_container=RoomPrice)
+    room_types = models.ArrayField(model_container=RoomTypePrice, blank=True, default=list)
+    image = models.ImageField(upload_to='hotel/', null=True, blank=True)
+
 
     class Meta(CommonInfo.Meta):
         abstract = False
@@ -153,6 +177,8 @@ class Hotel(CommonInfo):
 
 class Attraction(CommonInfo):
     tags = models.JSONField(default=list, blank=True)
+    image = models.ImageField(upload_to='attraction/', null=True, blank=True)
+
 
     class Meta(CommonInfo.Meta):
         abstract = False
