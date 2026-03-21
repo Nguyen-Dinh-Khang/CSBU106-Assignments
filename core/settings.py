@@ -47,6 +47,11 @@ INSTALLED_APPS = [
     'travel',
 ]
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'travel.backends.EmailBackend',
+]
+
 # Model user mặc định
 AUTH_USER_MODEL = 'travel.User'
 
