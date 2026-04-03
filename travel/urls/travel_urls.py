@@ -1,28 +1,39 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from ..views import *
 
+from ..views.trip_views import (
+    CreateTravelPlanView,
+    GetAreasView,
+    GetTravelHistoryView,
+    ViewPlanDetailView,
+    EditPlanView
+)
+from ..views.place_views import (
+    PlaceBrowseView,
+    PlaceDetailUniversalView,
+    RestaurantViewSet,
+    HotelViewSet,
+    AttractionViewSet
+)
 
 router = DefaultRouter()
-router.register(r'users', UserViewSet, basename='user')
+router.register(r'places/restaurants', RestaurantViewSet, basename='restaurant')
+router.register(r'places/hotels', HotelViewSet, basename='hotel')
+router.register(r'places/attractions', AttractionViewSet, basename='attraction')
 
 urlpatterns = [
-    path('api/login/', LoginView.as_view(), name='login'),
-    path('api/logout/', LogoutView.as_view(), name='logout'),
-    path('api/token/refresh/', CustomTokenRefreshView.as_view(), name='token_refresh'),
-    path('api/', include(router.urls)),
+    # Travel planning API
+    path('plan/', CreateTravelPlanView.as_view(), name='create_travel_plan'),
+    path('areas/', GetAreasView.as_view(), name='get_areas'),
+
+    # Travel history and plan details
+    path('history/', GetTravelHistoryView.as_view(), name='get_travel_history'),
+    path('plan/<str:plan_id>/', ViewPlanDetailView.as_view(), name='view_plan_detail'),
+    path('plan/<str:plan_id>/edit/', EditPlanView.as_view(), name='edit_plan'),
+
+    # Place browsing
+    path('places/browse/', PlaceBrowseView.as_view(), name='browse_places'),
+    path('places/<str:place_id>/', PlaceDetailUniversalView.as_view(), name='place_detail_universal'),
+
+    path('', include(router.urls)),
 ]
-
-
-# router = DefaultRouter()
-# # Đăng ký các ViewSet cho Hotel, Restaurant, Attraction
-# router.register(r'hotels', views.HotelViewSet, basename='hotel')
-# router.register(r'restaurants', views.RestaurantViewSet, basename='restaurant')
-# router.register(r'attractions', views.AttractionViewSet, basename='attraction')
-# # router.register(r'hotels', ...): này là tạo một lúc 5 cái Get, Put, Post,...
-
-# urlpatterns = [
-#     path('', include(router.urls)),
-#     # Nếu sau này bạn có hàm lọc cực khó (không dùng ViewSet), bạn sẽ thêm ở đây:
-#     # path('complex-filter/', views.ComplexFilterView.as_view()),
-# ]
