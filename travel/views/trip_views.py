@@ -10,6 +10,10 @@ import re
 
 from ..models import Location, TravelOutput, TravelInput
 
+# Có note hàm: CreateTravelPlanView(3 note)
+
+
+
 # UTILITIES
 def remove_vietnamese_accents(text):
     if not text:
@@ -76,6 +80,12 @@ class CreateTravelPlanView(APIView):
     """
     4: Lập kế hoạch
     """
+
+# Có một số cái không cần input nhưng mình vẫn cần lọc á. Sau khi đã làm xong cái đống bên dưới (lấy dữ liệu từ database)
+# rồi thì mình còn phải lấy cái đống dữ liệu đó để check xem địa điểm đó có nở cửa giờ đó hay ngày đó không. Còn phải kiểm 
+# tra xem địa điểm đó có bị trùng trong các ngày khác không á. Đề xuất của tui là chỉ lọc quán ăn một lần rồi bắt đầu
+# chia đều cái danh sách đó ra cho các buổi. Nhớ là không được lọc hai lần cùng một loại hình, lọc lần nào chắc lần đấy.
+
     def post(self, request):
         try:
             data = request.data
@@ -97,6 +107,8 @@ class CreateTravelPlanView(APIView):
             num_people = int(data['num_people'])
             area_id = data['area']
             
+
+# Chưa có ba cái biến này nha "percentage_hotel (int), percentage_restaurant (int), percentage_attraction (int)"
             location_str = data.get('location',[])
             travel_style = data.get('travel_style', [])
             food_type = data.get('food_type', [])
@@ -119,6 +131,7 @@ class CreateTravelPlanView(APIView):
                     center_coords = area_obj.coordinate.get('coordinates')
                     
             # ... Tiến hành lọc theo requirement (mongodb) -> id, name, has_surge_price, priority -> sort
+# Chỗ này là từng object chứ không phải chỉ có cái tên (VD: "Breakfast": obj1). Cấu trúc của mỗi obj thì xem lại file hướng dẫn
 
             dummy_schedule = [
                 {

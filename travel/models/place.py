@@ -84,8 +84,8 @@ class CommonInfo(models.Model):
     # location = models.JSONField(default=dict)
 
     # Thời gian hoạt động
-    off_weekdays = models.JSONField(default=get_default_list) # [1, 7] (1: chủ nhật, 7: thứ 7)
-    off_dates = models.JSONField(default=get_default_list)    # ["01-01", "30-04", "01-05"] (ngày-tháng)
+    off_weekdays = models.JSONField(default=get_default_list) # [1, 7] (1: chủ nhật, 7: thứ 7, rỗng là không có nghỉ)
+    off_dates = models.JSONField(default=get_default_list)    # ["01-01", "30-04", "01-05"] (ngày-tháng) (rỗng là không có nghỉ)
     active_hours = models.JSONField(default=get_default_list) # [1, 3] (0 cả ngày, 1 sáng, 2 trưa, 3 tối)
 
     # Giá cả

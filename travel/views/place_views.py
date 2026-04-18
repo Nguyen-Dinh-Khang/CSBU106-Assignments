@@ -12,6 +12,11 @@ import uuid
 from ..models import Location, Restaurant, Hotel, Attraction, Discount, Dish, RoomTypePrice, Comment
 from ..serializers import RestaurantSerializer, HotelSerializer, AttractionSerializer
 
+
+# Có note hàm: PlaceDetailUniversalView(1 note)
+
+
+
 # My location:
 class MyPlaceDetailView(APIView):
     permission_classes = [IsAuthenticated]
@@ -281,6 +286,7 @@ class PlaceDetailUniversalView(APIView):
     6: Thông tin chi tiết
     Lấy ID truy xuất tự động và parse đúng dữ liệu
     """
+# Chỗ này sữa lại là sẽ lọc theo loại hình user nha, tui có cập nhật user có thêm thẻ "type_location", vào model xem cho chi tiết
     def get(self, request, place_id):
         try:
             # Detect collection

@@ -261,10 +261,11 @@ if __name__ == "__main__":
     hotel_path = os.path.join(BASE_DIR, 'zRaw_data', 'data_hotel.txt')
     restaurant_path = os.path.join(BASE_DIR, 'zRaw_data', 'data_restaurant.txt')
     
+# Lần tới chạy clear tại quên chỉnh off_weekdays rỗng
     # Thay đổi đường dẫn file thực tế của bạn
-    # seed_attractions_clear_and_create(attraction_path)
+    seed_attractions_clear_and_create(attraction_path)
     # seed_attractions_update_or_create(attraction_path)
-    # seed_hotels_clear_and_create(hotel_path)
+    seed_hotels_clear_and_create(hotel_path)
     # seed_hotels_update_or_create(hotel_path)
     seed_restaurants_clear_and_create(restaurant_path)
     # seed_restaurants_update_or_create(restaurant_path)
