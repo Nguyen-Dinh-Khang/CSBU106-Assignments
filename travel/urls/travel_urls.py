@@ -6,15 +6,12 @@ from ..views.place_views import *
 from ..views.auth_views import *
 
 router = DefaultRouter()
-# router.register(r'users', UserViewSet, basename='user')
 router.register(r'users', UserViewSet, basename='user')
 router.register(r'places/restaurants', RestaurantViewSet, basename='restaurant')
 router.register(r'places/hotels', HotelViewSet, basename='hotel')
 router.register(r'places/attractions', AttractionViewSet, basename='attraction')
 
 urlpatterns = [
-    path('', include(router.urls)),
-
     # Authentication
     path('api/login/', LoginView.as_view(), name='login'),
     path('api/logout/', LogoutView.as_view(), name='logout'),
@@ -36,5 +33,5 @@ urlpatterns = [
     path('places/browse/', PlaceBrowseView.as_view(), name='browse_places'),
     path('places/<str:place_id>/', PlaceDetailUniversalView.as_view(), name='place_detail_universal'),
 
-    
+    path('', include(router.urls)),
 ]
