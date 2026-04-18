@@ -51,10 +51,11 @@ class AttractionSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'email', 'username', 'password', 'role']
+        fields = ['id', 'email', 'username', 'password', 'role', 'type_location']
         extra_kwargs = {
             'password': {'write_only': True},
-            'role': {'read_only': True}
+            'role': {'read_only': True},
+            'type_location': {'read_only': True}
         }
 
     def validate_email(self, value):
@@ -89,6 +90,7 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         # 1. Mặc định luôn là USER để an toàn
         role = 'USER'
+        type_location = 'NONE'
         
         # 2. Lấy request từ context (DRF tự động truyền request vào context khi gọi từ View)
         request = self.context.get('request')
@@ -98,12 +100,14 @@ class UserSerializer(serializers.ModelSerializer):
         if request and request.user.is_authenticated and getattr(request.user, 'role', None) == 'ADMIN':
             # Chỉ lúc này mới cho phép lấy role từ dữ liệu gửi lên (nếu có)
             role = validated_data.get('role', 'USER')
+            type_location = validated_data.get('type_location', 'NONE')
 
         # 4. Tạo User với role đã được "thẩm định"   
         user = User(
             email=validated_data['email'],
             username=validated_data['username'],
-            role=role
+            role=role,
+            type_location=type_location
         )
         user.set_password(validated_data['password'])  # 🔥 cực kỳ quan trọng
         user.save()

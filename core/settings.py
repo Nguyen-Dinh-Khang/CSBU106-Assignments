@@ -157,8 +157,13 @@ REST_FRAMEWORK = {
     ],
 }
 
+# 1. Cho phép gửi nhận Cookie/Token qua CORS
+CORS_ALLOW_CREDENTIALS = True
+
 # Cho phép React (thường chạy ở port 3000) truy cập
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
 ]

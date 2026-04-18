@@ -97,7 +97,7 @@ class CreateTravelPlanView(APIView):
             num_people = int(data['num_people'])
             area_id = data['area']
             
-            location_str = data.get('location')
+            location_str = data.get('location',[])
             travel_style = data.get('travel_style', [])
             food_type = data.get('food_type', [])
             accommodation_type = data.get('accommodation_type', [])

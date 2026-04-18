@@ -17,9 +17,17 @@ class UserViewSet(viewsets.ModelViewSet):
     # 🔥 Chỉ cho phép user thấy chính mình
     def get_queryset(self):
         user = self.request.user
+        # Nếu là Admin, cho phép thấy hết để quản lý
+        if user.is_authenticated and user.role == 'ADMIN':
+            return User.objects.all()
+        
+        # Nếu là User bình thường, chỉ thấy chính mình
         if user.is_authenticated:
             return User.objects.filter(id=user.id)
-        return User.objects.none()
+            
+        # QUAN TRỌNG: Khi đăng ký (create), DRF vẫn cần truy cập vào 
+        # queryset gốc để kiểm tra các ràng buộc dữ liệu.
+        return User.objects.all()
 
     # 🔐 Phân quyền theo action
     def get_permissions(self):
@@ -44,6 +52,9 @@ class LoginSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True)
 
 class LoginView(APIView):
+    # Cho phép mọi người truy cập không cần token
+    permission_classes = [AllowAny]
+
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

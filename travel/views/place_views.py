@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 import random
 
 from ..models import Location, Restaurant, Hotel, Attraction
@@ -33,6 +33,33 @@ class HotelViewSet(PlaceBaseViewSet):
 class AttractionViewSet(PlaceBaseViewSet):
     queryset = Attraction.objects.all()
     serializer_class = AttractionSerializer
+
+# My location:
+class MyPlaceDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        
+        # Kiểm tra loại địa điểm của user
+        if user.type_location == 'RESTAURANT':
+            # Giả sử bạn đã đặt related_name="owned_restaurant" ở model Restaurant
+            place = getattr(user, 'owned_restaurant', None)
+            serializer_class = RestaurantSerializer 
+        elif user.type_location == 'ACCOMMODATION':
+            place = getattr(user, 'owned_hotel', None)
+            serializer_class = HotelSerializer
+        elif user.type_location == 'ENTERTAINMENT':
+            place = getattr(user, 'owned_attraction', None)
+            serializer_class = AttractionSerializer
+        else:
+            return Response({"detail": "Bạn chưa cấu hình loại địa điểm."}, status=400)
+
+        if not place:
+            return Response({"detail": "Bạn chưa tạo địa điểm nào."}, status=404)
+
+        serializer = serializer_class(place)
+        return Response(serializer.data)
 
 
 # === Mục 5, 6: Browse và Detail ===

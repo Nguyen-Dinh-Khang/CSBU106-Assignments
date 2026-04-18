@@ -1,27 +1,28 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-from ..views.trip_views import (
-    CreateTravelPlanView,
-    GetAreasView,
-    GetTravelHistoryView,
-    ViewPlanDetailView,
-    EditPlanView
-)
-from ..views.place_views import (
-    PlaceBrowseView,
-    PlaceDetailUniversalView,
-    RestaurantViewSet,
-    HotelViewSet,
-    AttractionViewSet
-)
+from ..views.trip_views import *
+from ..views.place_views import *
+from ..views.auth_views import *
 
 router = DefaultRouter()
+# router.register(r'users', UserViewSet, basename='user')
+router.register(r'users', UserViewSet, basename='user')
 router.register(r'places/restaurants', RestaurantViewSet, basename='restaurant')
 router.register(r'places/hotels', HotelViewSet, basename='hotel')
 router.register(r'places/attractions', AttractionViewSet, basename='attraction')
 
 urlpatterns = [
+    path('', include(router.urls)),
+
+    # Authentication
+    path('api/login/', LoginView.as_view(), name='login'),
+    path('api/logout/', LogoutView.as_view(), name='logout'),
+    path('api/token/refresh/', CustomTokenRefreshView.as_view(), name='token_refresh'),
+
+    # My location
+    path('places/my-place/', MyPlaceDetailView.as_view(), name='my_place_detail'),
+
     # Travel planning API
     path('plan/', CreateTravelPlanView.as_view(), name='create_travel_plan'),
     path('areas/', GetAreasView.as_view(), name='get_areas'),
@@ -35,5 +36,5 @@ urlpatterns = [
     path('places/browse/', PlaceBrowseView.as_view(), name='browse_places'),
     path('places/<str:place_id>/', PlaceDetailUniversalView.as_view(), name='place_detail_universal'),
 
-    path('', include(router.urls)),
+    
 ]
