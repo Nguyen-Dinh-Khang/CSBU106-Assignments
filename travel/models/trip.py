@@ -1,6 +1,12 @@
 from djongo import models
 from django.conf import settings
 
+
+
+def default_dict(): return {}
+def default_list(): return []
+
+
 class TravelInput(models.Model):
     budget = models.DecimalField(max_digits=12, decimal_places=2)
     num_people = models.IntegerField(default=1)
@@ -10,11 +16,16 @@ class TravelInput(models.Model):
     departure_date = models.DateField() 
     return_date = models.DateField()    
     
+    # Phần trăm ngân sách cho từng hạn mục
+    percentage_hotel = models.IntegerField(null=False, blank=False)
+    percentage_restaurant = models.IntegerField(null=False, blank=False)
+    percentage_attraction = models.IntegerField(null=False, blank=False)
+
     # Các trường này cho phép để trống
     location = models.CharField(max_length=24, null=True, blank=True)
-    travel_style = models.IntegerField(null=True, blank=True)
-    food_type = models.IntegerField(null=True, blank=True)
-    accommodation_type = models.IntegerField(null=True, blank=True)
+    travel_style = models.JSONField(default=default_list, blank=True)
+    food_type = models.JSONField(default=default_list, blank=True)
+    accommodation_type = models.JSONField(default=default_list, blank=True)
 
     def __str__(self):
         return f"Trip to {self.area} for {self.num_people} people"
@@ -33,12 +44,14 @@ class TravelOutput(models.Model):
     # Dùng CharField để linh hoạt (có thể lưu ObjectId của MongoDB)
     input_id = models.CharField(max_length=100, verbose_name="ID Input gốc")
 
-    # Thông tin tổng kết (thông tin chung, hotel, ...)
-    summary_info = models.JSONField(default=dict, verbose_name="Thông tin tổng kết")
+    # Thông tin tổng kết (lưu hai cái dict, 
+    # một là summary_info gồm (obj hotel, main_location (cái này chỉ có tên thôi)
+    # hai là budget_breakdown gồm chi phí các loại hình)
+    summary_info = models.JSONField(default=default_dict, blank=True, verbose_name="Thông tin tổng kết")
 
     # Lịch trình chi tiết theo từng ngày
     # Mỗi phần tử trong list là 1 dict đại diện cho 1 ngày
-    itinerary = models.JSONField(default=list, verbose_name="Lịch trình chi tiết")
+    itinerary = models.JSONField(default=default_list, blank=True, verbose_name="Lịch trình chi tiết")
     ''' Cấu trúc từng ngày
     {
         "day": 1,
@@ -71,10 +84,10 @@ class Location(models.Model):
     search_name = models.CharField(max_length=255, help_text="vd: vinpearl land")
 
     # Tọa độ chuẩn GeoJSON để dùng 2dsphere
-    coordinate = models.JSONField(default=dict) 
+    coordinate = models.JSONField(default=default_dict, blank=True) 
     # Cấu trúc lưu: {"type": "Point", "coordinates": [long, lat]}
 
-    is_city = models.BooleanField(default=True)
+    is_city = models.BooleanField(default=default_list, blank=True)
     # Bán kính gợi ý khi tìm kiếm quanh điểm này (đơn vị: mét)
     # Thành phố có thể để 20000 (20km), điểm cụ thể để 2000 (2km)
     suggested_radius = models.IntegerField(default=5000)
