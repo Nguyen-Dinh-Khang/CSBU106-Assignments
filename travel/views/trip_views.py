@@ -10,7 +10,7 @@ import re
 
 from ..models import Location, TravelOutput, TravelInput
 
-# Có note hàm: CreateTravelPlanView(3 note)
+# Có note hàm: CreateTravelPlanView(5 note)
 
 
 
@@ -88,6 +88,11 @@ class CreateTravelPlanView(APIView):
 # một điều nữa là khi lọc và thêm vào danh sách thì nhớ chỉnh sữa dữ liệu rồi mới gửi cho frontend. Dữ liệu được gửi đi chỉ có 
 # các thuộc tính id, name, has_surge_price, img (sẽ có ảnh thật hoặc là null), tag (hoặc tương tự của mấy loại hình khác). Chỉ gửi cho frontend những cái thật sự cần thiết. Cái 
 # nào cần để tự mình lọc thì cứ lấy, nhưng sau khi lọc phải bỏ nó ra.
+
+# Trước khi xử lí output thì nhớ lưu lại input vào model TravelInput, sau khi lưu thì gửi id của input này đi kèm luôn
+
+# Ông chưa có gửi đi thông tin summary, nó bao gồm một object hotel và main_location (lưu cái tên ở đây và ưu tiên chọn 
+# location hơn là area)
 
     def post(self, request):
         try:
