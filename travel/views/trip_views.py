@@ -84,7 +84,10 @@ class CreateTravelPlanView(APIView):
 # Có một số cái không cần input nhưng mình vẫn cần lọc á. Sau khi đã làm xong cái đống bên dưới (lấy dữ liệu từ database)
 # rồi thì mình còn phải lấy cái đống dữ liệu đó để check xem địa điểm đó có nở cửa giờ đó hay ngày đó không. Còn phải kiểm 
 # tra xem địa điểm đó có bị trùng trong các ngày khác không á. Đề xuất của tui là chỉ lọc quán ăn một lần rồi bắt đầu
-# chia đều cái danh sách đó ra cho các buổi. Nhớ là không được lọc hai lần cùng một loại hình, lọc lần nào chắc lần đấy.
+# chia đều cái danh sách đó ra cho các buổi. Nhớ là không được lọc hai lần cùng một loại hình, lọc lần nào chắc lần đấy. Thêm 
+# một điều nữa là khi lọc và thêm vào danh sách thì nhớ chỉnh sữa dữ liệu rồi mới gửi cho frontend. Dữ liệu được gửi đi chỉ có 
+# các thuộc tính id, name, has_surge_price, img (sẽ có ảnh thật hoặc là null), tag (hoặc tương tự của mấy loại hình khác). Chỉ gửi cho frontend những cái thật sự cần thiết. Cái 
+# nào cần để tự mình lọc thì cứ lấy, nhưng sau khi lọc phải bỏ nó ra.
 
     def post(self, request):
         try:
