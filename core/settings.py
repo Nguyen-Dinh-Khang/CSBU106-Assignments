@@ -153,7 +153,7 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated', # Mặc định bắt đăng nhập mới cho dùng API
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly', # Mặc định bắt đăng nhập mới cho dùng API
     ],
 }
 
