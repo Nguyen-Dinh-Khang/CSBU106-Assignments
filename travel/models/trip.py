@@ -17,9 +17,9 @@ class TravelInput(models.Model):
     return_date = models.DateField()    
     
     # Phần trăm ngân sách cho từng hạn mục
-    percentage_hotel = models.IntegerField(null=False, blank=False)
-    percentage_restaurant = models.IntegerField(null=False, blank=False)
-    percentage_attraction = models.IntegerField(null=False, blank=False)
+    percentage_hotel = models.IntegerField(default=30, null=False, blank=False)
+    percentage_restaurant = models.IntegerField(default=35, null=False, blank=False)
+    percentage_attraction = models.IntegerField(default=30, null=False, blank=False)
 
     # Các trường này cho phép để trống
     location = models.CharField(max_length=24, null=True, blank=True)

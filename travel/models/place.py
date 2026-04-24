@@ -8,45 +8,45 @@ import uuid
 
 # --- Menu quán ăn ----------------------------------------------------------------------------------------------------------------
 class Dish(models.Model):
-    dish_id = models.UUIDField(default=uuid.uuid4, editable=False)
+    dish_id = models.UUIDField(default=uuid.uuid4, editable=False, null=True, blank=True)
     dish_name = models.CharField(max_length=100)
     price = models.IntegerField()
-    description = models.TextField(blank=True, help_text="Thông tin chi tiết")
+    description = models.TextField(blank=True, null=True, help_text="Thông tin chi tiết")
 
     class Meta:
         abstract = True # Dùng để nhúng, không tạo bảng riêng
 
 # --- Giá phòng khác sạn ----------------------------------------------------------------------------------------------------------
 class RoomTypePrice(models.Model):
-    room_type_id = models.UUIDField(default=uuid.uuid4, editable=False)
+    room_type_id = models.UUIDField(default=uuid.uuid4, editable=False, null=True, blank=True)
     type_name = models.CharField(max_length=100) # VD: Deluxe, Standard
     price = models.IntegerField()
-    description = models.TextField(blank=True, help_text="Thông tin chi tiết")
+    description = models.TextField(blank=True, null=True, help_text="Thông tin chi tiết")
 
     class Meta:
         abstract = True
 
 # --- Giảm giá --------------------------------------------------------------------------------------------------------------------
 class Discount(models.Model):
-    discount_id = models.UUIDField(default=uuid.uuid4, editable=False)
+    discount_id = models.UUIDField(default=uuid.uuid4, editable=False, null=True, blank=True)
     title = models.CharField(max_length=200) # Tên chương trình
     percent = models.IntegerField()          # Con số % giảm giá (VD: 10, 20, 50)
-    description = models.TextField(blank=True, help_text="Thông tin chi tiết")
+    description = models.TextField(blank=True, null=True, help_text="Thông tin chi tiết")
 
     # Ngày hiệu lực
-    start_date = models.DateField()
-    end_date = models.DateField()
+    start_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
 
     class Meta:
         abstract = True
 
 # --- Comment ---------------------------------------------------------------------------------------------------------------------
 class Comment(models.Model):
-    comment_id = models.UUIDField(default=uuid.uuid4, editable=False)
-    user_id = models.CharField(max_length=50)
+    comment_id = models.UUIDField(default=uuid.uuid4, editable=False, null=True, blank=True)
+    user_id = models.CharField(max_length=50, null=True, blank=True)
     commenter = models.CharField(max_length=100)
     content = models.TextField()
-    date = models.DateTimeField(auto_now_add=True)
+    date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
     class Meta:
         abstract = True
