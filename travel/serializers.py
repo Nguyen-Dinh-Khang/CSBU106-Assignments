@@ -2,25 +2,36 @@ from rest_framework import serializers
 from .models import User, Restaurant, Hotel, Attraction, Location, TravelInput, TravelOutput, Dish, RoomTypePrice, Discount, Comment
 
 
-class DishSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Dish
-        fields = '__all__'
+# --- Dish Serializer ------------------------------------------------------------------
+class DishSerializer(serializers.Serializer):
+    dish_id = serializers.UUIDField(required=False)
+    dish_name = serializers.CharField(max_length=100)
+    price = serializers.IntegerField()
+    description = serializers.CharField(required=False, allow_blank=True, allow_null=True)
 
-class RoomTypePriceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = RoomTypePrice
-        fields = '__all__'
+# --- RoomTypePrice Serializer ---------------------------------------------------------
+class RoomTypePriceSerializer(serializers.Serializer):
+    room_type_id = serializers.UUIDField(required=False)
+    type_name = serializers.CharField(max_length=100)
+    price = serializers.IntegerField()
+    description = serializers.CharField(required=False, allow_blank=True, allow_null=True)
 
-class DiscountSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Discount
-        fields = '__all__'
+# --- Discount Serializer --------------------------------------------------------------
+class DiscountSerializer(serializers.Serializer):
+    discount_id = serializers.UUIDField(required=False)
+    title = serializers.CharField(max_length=200)
+    percent = serializers.IntegerField()
+    description = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    start_date = serializers.DateField(required=False, allow_null=True)
+    end_date = serializers.DateField(required=False, allow_null=True)
 
-class CommentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Comment
-        fields = '__all__'
+# --- Comment Serializer ---------------------------------------------------------------
+class CommentSerializer(serializers.Serializer):
+    comment_id = serializers.UUIDField(required=False)
+    user_id = serializers.CharField(max_length=50, required=False, allow_blank=True, allow_null=True)
+    commenter = serializers.CharField(max_length=100)
+    content = serializers.CharField()
+    date = serializers.DateTimeField(required=False, allow_null=True)
 
 class RestaurantSerializer(serializers.ModelSerializer):
     dishes = DishSerializer(many=True, read_only=True)

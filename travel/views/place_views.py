@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated, AllowAny
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from django.utils import timezone
@@ -243,6 +243,9 @@ class PlaceBrowseView(APIView):
     """
     5: List địa điểm (trường hợp Lần đầu / Sau đó)
     """
+    # Dòng này sẽ mở cửa cho tất cả mọi người (không cần login)
+    permission_classes = [AllowAny]
+    
     def get(self, request):
         try:
             filters = request.GET.dict()
