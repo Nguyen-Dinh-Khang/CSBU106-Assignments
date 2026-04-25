@@ -14,7 +14,7 @@ from ..serializers import RestaurantSerializer, HotelSerializer, AttractionSeria
 
 
 
-
+# Có note ở: PlaceBrowseView(1 note)
 
 
 # My location:
@@ -252,7 +252,10 @@ class PlaceBrowseView(APIView):
     """
     # Dòng này sẽ mở cửa cho tất cả mọi người (không cần login)
     permission_classes = [AllowAny]
-    
+
+# Thêm cái tìm kiếm theo tên, biến là "name". Thêm một biến nữa để lưu và thêm một cái else if nữa là được. Nhớ là dùng cú pháp 
+# lọc gần giống thôi chứ không dùng cú pháp lọc khớp 100% nha.
+
     def get(self, request):
         try:
             filters = request.GET.dict()
