@@ -24,23 +24,30 @@ class MyPlaceDetailView(APIView):
     def get(self, request):
         user = request.user
         
-        # Kiểm tra loại địa điểm của user
-        if user.type_location == 'RESTAURANT':
-            # Giả sử bạn đã đặt related_name="owned_restaurant" ở model Restaurant
-            place = getattr(user, 'owned_restaurant', None)
-            serializer_class = RestaurantSerializer 
-        elif user.type_location == 'ACCOMMODATION':
-            place = getattr(user, 'owned_hotel', None)
-            serializer_class = HotelSerializer
-        elif user.type_location == 'ENTERTAINMENT':
-            place = getattr(user, 'owned_attraction', None)
-            serializer_class = AttractionSerializer
-        else:
-            return Response({"detail": "Bạn chưa cấu hình loại địa điểm."}, status=400)
+        # Mapping để code sạch và dễ quản lý
+        location_map = {
+            'RESTAURANT': ('owned_restaurant', RestaurantSerializer),
+            'ACCOMMODATION': ('owned_hotel', HotelSerializer),
+            'ENTERTAINMENT': ('owned_attraction', AttractionSerializer),
+        }
+
+        config = location_map.get(user.type_location)
+
+        if not config:
+            return Response({"detail": f"Loại tài khoản '{user.type_location}' không hỗ trợ quản lý địa điểm."}, status=400)
+
+        related_name, serializer_class = config
+        
+        # Lấy Manager (tập hợp các địa điểm)
+        manager = getattr(user, related_name, None)
+        
+        # Lấy địa điểm đầu tiên từ tập hợp đó
+        place = manager.first() if manager else None
 
         if not place:
-            return Response({"detail": "Bạn chưa tạo địa điểm nào."}, status=404)
+            return Response({"detail": "Bạn chưa tạo thông tin địa điểm nào."}, status=404)
 
+        # Bây giờ 'place' đã là một object cụ thể, Serializer sẽ chạy đúng
         serializer = serializer_class(place)
         return Response(serializer.data)
 
