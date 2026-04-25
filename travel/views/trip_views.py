@@ -10,7 +10,7 @@ import re
 
 from ..models import Location, TravelOutput, TravelInput
 
-# Có note hàm: CreateTravelPlanView(5 note)
+# Có note hàm: CreateTravelPlanView(5 note), EditPlanView(1 note)
 
 
 
@@ -209,6 +209,10 @@ class EditPlanView(APIView):
     """
     9: Chỉnh sửa kế hoạch (can_change=True, tái xử lý từ TravelInput)
     """
+
+# Cái hàm này hình như chưa hoàn thành với lại ông xem lại cái model TravelOutput nha, tui có thêm chú thích vào và hình như 
+# cái budget_breakdown và hotel_id nó có bị nhầm lần gì đó á
+
     def get(self, request, plan_id):
         try:
             plan = TravelOutput.objects.get(id=plan_id)
