@@ -253,8 +253,9 @@ class PlaceBrowseView(APIView):
     # Dòng này sẽ mở cửa cho tất cả mọi người (không cần login)
     permission_classes = [AllowAny]
 
-# Thêm cái tìm kiếm theo tên, biến là "name". Thêm một biến nữa vào has_filters và thêm một cái else if nữa là được. Nhớ là dùng 
-# cú pháp lọc gần giống thôi chứ không dùng cú pháp lọc khớp 100% nha.
+# Thêm cái tìm kiếm theo tên, biến là "name". Thêm một biến nữa vào has_filters và thêm một cái else if nữa để filter cả 3 model 
+# là được. Nhớ là dùng cú pháp lọc gần giống thôi chứ không dùng cú pháp lọc khớp 100% nha. Dữ liệu của "name" sẽ được lưu 
+# là "Locations": list(). Lọc sao cho tối ưu tùy ông quyết định
 
     def get(self, request):
         try:
