@@ -12,8 +12,8 @@ from django.db import transaction
 
 
 TYPE_MAPPING = {
-    'ATTRACTION': (Attraction, 'ATTRACTION'),
-    'HOTEL': (Hotel, 'HOTEL'),
+    'ATTRACTION': (Attraction, 'ENTERTAINMENT'),
+    'HOTEL': (Hotel, 'ACCOMMODATION'),
     'RESTAURANT': (Restaurant, 'RESTAURANT'),
 }
 
