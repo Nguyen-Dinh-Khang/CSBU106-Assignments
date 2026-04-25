@@ -78,7 +78,8 @@ class LoginView(APIView):
                 "user": {
                     "email": user.email,
                     "role": user.role,
-                    "username": user.username
+                    "username": user.username,
+                    "type_location": user.type_location
                 }
             }, status=status.HTTP_200_OK)
 
@@ -90,6 +91,8 @@ class LoginView(APIView):
                 secure=False,
                 samesite='Lax'
             )
+            print("---- Đăng nhập thành công ----")
+
             return response
 
         return Response({"error": "Email hoặc mật khẩu không chính xác"}, status=status.HTTP_401_UNAUTHORIZED)
@@ -102,7 +105,8 @@ class LogoutView(APIView):
         
         # Xóa cookie bằng cách đặt giá trị rỗng và hết hạn ngay lập tức
         response.delete_cookie('refresh_token')
-        
+        print("---- Đăng xuất thành công ----")
+
         return response
 
 class CustomTokenRefreshView(APIView):
