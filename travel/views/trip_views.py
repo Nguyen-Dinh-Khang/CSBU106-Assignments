@@ -180,10 +180,11 @@ class GetTravelHistoryView(APIView):
     
     def get(self, request):
         history = TravelOutput.objects.filter(user=request.user).order_by('-created_at')
+
         data = [{
             "id": str(item.id),
-            "created_at": item.created_at.strftime('%Y-%m-%d %H:%M:%S'),
-            "location": item.summary_info.get('location', '')
+            "end_day": item.itinerary[-1].get('day', 0).strftime('%Y-%m-%d'),
+            "location": item.summary_info.get('summary_info').get('main_location', '')
         } for item in history]
         return Response({"success": True, "data": data}, status=status.HTTP_200_OK)
 
