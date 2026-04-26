@@ -2,6 +2,7 @@ from rest_framework.views import APIView
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import status
+import traceback
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated, AllowAny
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
@@ -250,49 +251,72 @@ class PlaceBrowseView(APIView):
     """
     5: List địa điểm (trường hợp Lần đầu / Sau đó)
     """
-    # Dòng này sẽ mở cửa cho tất cả mọi người (không cần login)
-    permission_classes = [AllowAny]
-
-# Thêm cái tìm kiếm theo tên, biến là "name". Thêm một biến nữa vào has_filters và thêm một cái else if nữa để filter cả 3 model 
-# là được. Nhớ là dùng cú pháp lọc gần giống thôi chứ không dùng cú pháp lọc khớp 100% nha. Dữ liệu của "name" sẽ được lưu 
-# là "Locations": list(). Lọc sao cho tối ưu tùy ông quyết định 
 
     def get(self, request):
         try:
             filters = request.GET.dict()
-            has_filters = any(k in ["travel_style", "food_type", "accommodation_type"] for k in filters.keys())
+            has_filters = any(k in ["travel_style", "food_type", "accommodation_type", "name"] for k in filters.keys())
+            
+            # Thêm cái này để search tên
+            search_name = filters.get("name", "").strip()
 
             # Cần trả về format {"Hotels": [...], "Restaurants": [...], "Attractions": [...]}
             # Các data chỉ gồm id, name, address, rating, price_level
+            response_data = {}
+            fields = ['id', 'name', 'address', 'rating', 'price_level']
+
 
             response_data = {}
             if not has_filters:
                 # Lần đầu: Random 12 items
-                # Do Django ORM random sẽ là ? order_by('?')
-                h_qs = Hotel.objects.order_by('?')[:12].values('id', 'name', 'address', 'rating', 'price_level')
-                r_qs = Restaurant.objects.order_by('?')[:12].values('id', 'name', 'address', 'rating', 'price_level')
-                a_qs = Attraction.objects.order_by('?')[:12].values('id', 'name', 'address', 'rating', 'price_level')
+                # Không dùng "?" để lấy ngẫu nhiên vì nó lỗi
+                h_data = list(Hotel.objects.all()[:50].values(*fields))
+                r_data = list(Restaurant.objects.all()[:50].values(*fields))
+                a_data = list(Attraction.objects.all()[:50].values(*fields))
                 
+                # Trộn ngẫu nhiên danh sách bằng Python (không lỗi DB)
+                import random
+                random.shuffle(h_data)
+                random.shuffle(r_data)
+                random.shuffle(a_data)
+
                 response_data = {
-                    "Hotels": list(h_qs),
-                    "Restaurants": list(r_qs),
-                    "Attractions": list(a_qs)
+                    "Hotels": h_data[:12],
+                    "Restaurants": r_data[:12],
+                    "Attractions": a_data[:12]
                 }
             else:
                 # Có filter: Mỗi lần chỉ lọc 1 loại
                 if "accommodation_type" in filters:
-                    h_qs = Hotel.objects.filter(hotel_type=filters["accommodation_type"])[:12].values('id', 'name', 'address', 'rating', 'price_level')
+                    h_qs = Hotel.objects.filter(hotel_type=filters["accommodation_type"])[:12].values(*fields)
                     response_data = {"Hotels": list(h_qs)}
                 elif "food_type" in filters:
-                    r_qs = Restaurant.objects.filter(cuisine_types__contains=filters["food_type"])[:12].values('id', 'name', 'address', 'rating', 'price_level')
+                    r_qs = Restaurant.objects.filter(cuisine_types__contains=filters["food_type"])[:12].values(*fields)
                     response_data = {"Restaurants": list(r_qs)}
                 elif "travel_style" in filters:
-                    a_qs = Attraction.objects.filter(tags__contains=filters["travel_style"])[:12].values('id', 'name', 'address', 'rating', 'price_level')      
+                    a_qs = Attraction.objects.filter(tags__contains=filters["travel_style"])[:12].values(*fields)      
                     response_data = {"Attractions": list(a_qs)}
+                elif search_name:
+                    # Lọc gần đúng theo tên (không phân biệt hoa thường)
+                    # Chúng ta tìm ở cả 3 danh mục
+                    h_search = Hotel.objects.filter(name__icontains=search_name)[:12].values(*fields)
+                    r_search = Restaurant.objects.filter(name__icontains=search_name)[:12].values(*fields)
+                    a_search = Attraction.objects.filter(name__icontains=search_name)[:12].values(*fields)
+
+                    response_data = {
+                        "Hotels": list(h_search),
+                        "Restaurants": list(r_search),
+                        "Attractions": list(a_search)
+                    }
                     
+            # print("Dữ liệu trả về nè", response_data)
             return Response(response_data, status=status.HTTP_200_OK)
                 
+        # Cái đống này là để in lỗi chi tiết (nếu có) cho AI nó dễ tìm lỗi
         except Exception as e:
+            print("--- DEBUG ERROR ---")
+            traceback.print_exc() # Nó sẽ in chi tiết lỗi dòng nào, file nào ra Terminal
+            print("-------------------")
             return Response({'success': False, 'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class PlaceDetailUniversalView(APIView):
