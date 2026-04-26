@@ -10,7 +10,7 @@ import re
 
 from ..models import Location, TravelOutput, TravelInput
 
-# Có note hàm: CreateTravelPlanView(5 note), EditPlanView(1 note)
+# Có note hàm: CreateTravelPlanView(5 note), ViewPlanDetailView(2 note), EditPlanView(2 note)
 
 
 
@@ -192,6 +192,14 @@ class ViewPlanDetailView(APIView):
     """
     8: Xem chi tiết kế hoạch (can_change=False)
     """
+
+# Ông xem lại cái model TravelOutput nha, tui có thêm chú thích vào và hình như cái budget_breakdown và hotel_id nó có bị 
+# nhầm lần gì đó á, tui không nhớ có bao nhiêu hàm liên quan nhưng mà ông biết cái nào có liên quan đến model thì sửa luôn
+# "budget_breakdown": plan.summary_info.budget_breakdown, 
+# "summary_info": plan.summary_info.summary_info
+
+# Chỗ này nó còn gửi đi thông tin của input nữa đó nha, kiểm tra lại trong file docx
+
     def get(self, request, plan_id):
         try:
             plan = TravelOutput.objects.get(id=plan_id)
@@ -211,7 +219,10 @@ class EditPlanView(APIView):
     """
 
 # Cái hàm này hình như chưa hoàn thành với lại ông xem lại cái model TravelOutput nha, tui có thêm chú thích vào và hình như 
-# cái budget_breakdown và hotel_id nó có bị nhầm lần gì đó á
+# cái budget_breakdown và hotel_id nó có bị nhầm lần gì đó á, tui không nhớ có bao nhiêu hàm liên quan nhưng mà ông biết cái 
+# nào có liên quan đến model thì sửa luôn
+
+# Chỗ này nó còn gửi đi thông tin của input nữa đó nha, kiểm tra lại trong file docx
 
     def get(self, request, plan_id):
         try:
