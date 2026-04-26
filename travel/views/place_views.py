@@ -246,7 +246,7 @@ class AttractionViewSet(PlaceBaseViewSet):
     serializer_class = AttractionSerializer
 
 # === Mục 5, 6: Browse và Detail ===
-
+# Khang đã hoàn thành cái hàm này, đã check thành công 
 class PlaceBrowseView(APIView):
     """
     5: List địa điểm (trường hợp Lần đầu / Sau đó)
@@ -319,6 +319,8 @@ class PlaceBrowseView(APIView):
             print("-------------------")
             return Response({'success': False, 'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+# Cái hàm này tạm thời bỏ
 class PlaceDetailUniversalView(APIView):
     """
     6: Thông tin chi tiết
